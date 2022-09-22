@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "50945720064",
+    "project_id": "sunday-suspense-14243",
+    "storage_bucket": "sunday-suspense-14243.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:50945720064:android:ca46877ec54f647cba3de5",
+        "android_client_info": {
+          "package_name": "com.example.sunday_suspense"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50945720064-69rfml9vv77g3ou0414gf048uugl4i9j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAnCIzi6qKv1LJKmKhqR1GLu6fVqYsvVwg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50945720064-69rfml9vv77g3ou0414gf048uugl4i9j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

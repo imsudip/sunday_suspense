@@ -26,13 +26,12 @@ class _SearchScreenState extends State<SearchScreen> {
   int page = 2;
 
   void submitSearch(String query) async {
-    if (query.isNotEmpty) {
-      var results = await DatabaseService.getSongsUsingTag(query);
-      setState(() {
-        page = 1;
-        searchResults = results;
-      });
-    }
+    print("searching...");
+    var results = await DatabaseService.getSongsUsingTag(query);
+    setState(() {
+      page = 2;
+      searchResults = results;
+    });
   }
 
   bool _hasMore = true;
@@ -40,7 +39,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<bool> _loadMore() async {
     print("loading more");
     if (!_hasMore) return false;
-    var songs = await DatabaseService.getSongsUsingTag(searchController.text, page: page);
+    print(page);
+    var songs = await DatabaseService.getSongsFromSearch(searchController.text, page: page);
     if (songs.length < 10) {
       _hasMore = false;
     }
@@ -59,6 +59,12 @@ class _SearchScreenState extends State<SearchScreen> {
     searchController.addListener(() => debouncer.value = searchController.text);
     debouncer.values.listen((search) => submitSearch(search));
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -81,7 +87,6 @@ class _SearchScreenState extends State<SearchScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             child: CupertinoTextField(
               placeholder: 'Search',
-              readOnly: true,
               controller: searchController,
               style: AppTextStyle.bodytext1,
               placeholderStyle: AppTextStyle.bodytext1.copyWith(color: AppColors.textSecondaryColor),

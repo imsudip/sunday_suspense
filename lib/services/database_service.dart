@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../widgets/song_viewers.dart';
 
 const String baseUrl = 'https://zk3rid.deta.dev';
@@ -22,6 +24,13 @@ class DatabaseService {
   static Future<List<Map<String, dynamic>>> getSongsUsingTag(String tag,
       {bool fuzzy = false, String mode = "or", int count = 10, int page = 1}) async {
     final url = "$baseUrl/search?query=$tag&count=$count&page=$page";
+    var res = await http.get(Uri.parse(url));
+    var jdata = jsonDecode(res.body);
+    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
+  }
+
+  static Future<List<Map<String, dynamic>>> getSongsFromSearch(String tag, {int count = 10, int page = 1}) async {
+    final url = "$baseUrl/search?query=$tag&count=$count&page=$page&fuzzy=true&mode=or";
     var res = await http.get(Uri.parse(url));
     var jdata = jsonDecode(res.body);
     return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();

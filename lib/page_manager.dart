@@ -25,11 +25,6 @@ class PageManager {
   final isLastSongNotifier = ValueNotifier<bool>(true);
   final isShuffleModeEnabledNotifier = ValueNotifier<bool>(false);
 
-  final currentRoomNotifier = ValueNotifier<String>('');
-  final listeningToRoomNotifier = ValueNotifier<bool>(false);
-  final streamSubcription = ValueNotifier<StreamSubscription?>(null);
-  final haltListeningNotifier = ValueNotifier<bool>(false);
-
   final _audioHandler = getIt<AudioHandler>();
 
   final box = GetStorage("HistoryBox");
@@ -43,13 +38,6 @@ class PageManager {
     _listenToBufferedPosition();
     _listenToTotalDuration();
     _listenToChangesInSong();
-    _listenToChangesInRoom();
-  }
-
-  void _listenToChangesInRoom() {
-    currentRoomNotifier.addListener(() {
-      log("Room changed to ${currentRoomNotifier.value}");
-    });
   }
 
   void _listenToChangesInPlaylist() {
@@ -239,7 +227,6 @@ class PageManager {
 
   void dispose() {
     _audioHandler.customAction('dispose');
-    streamSubcription.value?.cancel();
   }
 
   void stop() {

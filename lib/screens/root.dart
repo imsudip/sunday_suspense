@@ -1,7 +1,7 @@
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:sunday_suspense/screens/historypage.dart';
+import 'historypage.dart';
 import 'categorypage.dart';
 import 'homepage.dart';
 import '../ui/app_colors.dart';

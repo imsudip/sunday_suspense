@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sunday_suspense/screens/searchScreen.dart';
+import 'searchScreen.dart';
 import 'show_all_page.dart';
 import '../services/database_service.dart';
 import '../ui/app_colors.dart';
@@ -47,7 +47,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       onTap: () {
                         Get.to(() => const SearchScreen());
                       },
-                      child: const SearchBar()),
+                      child: AbsorbPointer(child: const SearchBar())),
                   const TrendingBar(),
                   const CategoryBar(title: "🎩 Sherlock Holmes", tag: "sherlock"),
                   const CategoryBar(title: "🚬 Feluda", tag: "feluda"),

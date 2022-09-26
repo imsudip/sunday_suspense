@@ -23,7 +23,7 @@ class MyAudioHandler extends BaseAudioHandler {
     _notifyAudioHandlerAboutPlaybackEvents();
     _listenForDurationChanges();
     _listenForCurrentSongIndexChanges();
-    _listenForSequenceStateChanges();
+    // _listenForSequenceStateChanges();
   }
 
   Future<void> _loadEmptyPlaylist() async {
@@ -97,14 +97,14 @@ class MyAudioHandler extends BaseAudioHandler {
     });
   }
 
-  void _listenForSequenceStateChanges() {
-    _player.sequenceStateStream.listen((SequenceState? sequenceState) {
-      final sequence = sequenceState?.effectiveSequence;
-      if (sequence == null || sequence.isEmpty) return;
-      final items = sequence.map((source) => source.tag as MediaItem);
-      queue.add(items.toList());
-    });
-  }
+  // void _listenForSequenceStateChanges() {
+  //   _player.sequenceStateStream.listen((SequenceState? sequenceState) {
+  //     final sequence = sequenceState?.effectiveSequence;
+  //     if (sequence == null || sequence.isEmpty) return;
+  //     final items = sequence.map((source) => source.tag as MediaItem);
+  //     queue.add(items.toList());
+  //   });
+  // }
 
   @override
   Future<void> addQueueItems(List<MediaItem> mediaItems) async {
@@ -131,7 +131,7 @@ class MyAudioHandler extends BaseAudioHandler {
   LockCachingAudioSource _createAudioSource(MediaItem mediaItem) {
     return LockCachingAudioSource(
       Uri.parse(mediaItem.extras!['url']),
-      tag: mediaItem,
+      tag: mediaItem.id,
     );
   }
 

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sunday_suspense/services/database_service.dart';
-import 'package:sunday_suspense/ui/text_styles.dart';
-import 'package:sunday_suspense/widgets/song_viewers.dart';
+import '../services/database_service.dart';
+import '../ui/text_styles.dart';
+import '../widgets/song_viewers.dart';
 
 import '../ui/app_colors.dart';
 

@@ -52,18 +52,6 @@ class PlayerScreen extends StatelessWidget {
                         Get.back();
                       },
                     ),
-                    actions: [
-                      // IconButton(
-                      //     onPressed: () {
-                      //       Get.to(() => const CreateRoomPage());
-                      //     },
-                      //     icon: const Icon(Iconsax.add)),
-                      // IconButton(
-                      //     onPressed: () {
-                      //       Get.to(() => const JoinRoomPage());
-                      //     },
-                      //     icon: const Icon(Icons.meeting_room)),
-                    ],
                   ),
                   const SizedBox(height: 80),
                   Container(

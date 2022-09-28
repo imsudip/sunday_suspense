@@ -16,7 +16,7 @@ Future<AudioHandler> initAudioService() async {
 
 class MyAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
-  final _playlist = ConcatenatingAudioSource(children: []);
+  final _playlist = ConcatenatingAudioSource(children: [], useLazyPreparation: false);
 
   MyAudioHandler() {
     _loadEmptyPlaylist();

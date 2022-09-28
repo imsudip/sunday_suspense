@@ -52,6 +52,45 @@ class PlayerScreen extends StatelessWidget {
                         Get.back();
                       },
                     ),
+                    actions: [
+                      // quality button
+                      ValueListenableBuilder<String>(
+                          valueListenable: pageManager.audioQualityNotifier,
+                          builder: (_, quality, __) {
+                            return PopupMenuButton<String>(
+                              onSelected: (value) {
+                                pageManager.changeAudioQuality(pageManager.audioQualityStoreNotifier.value[value]!);
+                                pageManager.audioQualityNotifier.value = value;
+                              },
+                              itemBuilder: (context) {
+                                // audio quality stored in {quality:url} format
+                                return List.generate(
+                                        pageManager.audioQualityStoreNotifier.value.keys.length, (index) => index)
+                                    .map((e) => PopupMenuItem(
+                                          value: pageManager.audioQualityStoreNotifier.value.keys.elementAt(e),
+                                          child: Text(pageManager.audioQualityStoreNotifier.value.keys
+                                              .elementAt(e)
+                                              .capitalizeFirst!),
+                                        ))
+                                    .toList();
+                              },
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Iconsax.cd,
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(quality.capitalizeFirst!),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                    ],
                   ),
                   const SizedBox(height: 80),
                   Container(

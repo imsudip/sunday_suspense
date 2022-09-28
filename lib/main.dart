@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sunday_suspense/services/notification_service.dart';
 import 'screens/root.dart';
 import 'ui/my_theme.dart';
 import 'page_manager.dart';
@@ -9,9 +10,13 @@ import 'services/service_locator.dart';
 
 void main() async {
   await setupServiceLocator();
-  await GetStorage.init("likes");
+  await GetStorage.init("prefs");
   await GetStorage.init('HistoryBox');
   runApp(const MyApp());
+  await fcmFunctions.initApp();
+  await fcmFunctions.iosWebPermission();
+  fcmFunctions.foreGroundMessageListener();
+  await fcmFunctions.subscripeToTopics("news");
 }
 
 class MyApp extends StatefulWidget {

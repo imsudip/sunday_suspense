@@ -46,6 +46,7 @@ class MyTheme {
       inputDecorationTheme: ligthTheme.inputDecorationTheme,
       bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.transparent),
       bottomAppBarTheme: const BottomAppBarTheme(color: Colors.transparent),
+      cardColor: AppColors.accentColor,
     );
   }
 }

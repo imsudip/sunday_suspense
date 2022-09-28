@@ -24,10 +24,13 @@ class PageManager {
   final playButtonNotifier = PlayButtonNotifier();
   final isLastSongNotifier = ValueNotifier<bool>(true);
   final isShuffleModeEnabledNotifier = ValueNotifier<bool>(false);
+  final audioQualityNotifier = ValueNotifier<String>('');
+  final audioQualityStoreNotifier = ValueNotifier<Map<String, String>>({}); // Map<quality, url>
 
   final _audioHandler = getIt<AudioHandler>();
 
   final box = GetStorage("HistoryBox");
+  final prefs = GetStorage("prefs");
 
   // Events: Calls coming from the UI
   void init() async {
@@ -38,6 +41,7 @@ class PageManager {
     _listenToBufferedPosition();
     _listenToTotalDuration();
     _listenToChangesInSong();
+    audioQualityNotifier.value = prefs.read("audioQuality") ?? "high";
   }
 
   void _listenToChangesInPlaylist() {
@@ -213,6 +217,35 @@ class PageManager {
     });
 
     // _audioHandler.skipToQueueItem(index)
+  }
+
+  Future<void> changeAudioQuality(String url) async {
+    var oldMediaItem = _audioHandler.mediaItem.value!;
+    final newMediaItem = MediaItem(
+      id: oldMediaItem.id,
+      album: oldMediaItem.album,
+      title: oldMediaItem.title,
+      artUri: oldMediaItem.artUri,
+      extras: {'url': url},
+    );
+    await remove();
+    await _audioHandler.addQueueItem(newMediaItem);
+    await _audioHandler.play();
+    Future.delayed(const Duration(seconds: 1), () {
+      _audioHandler.play();
+      if (box.read(oldMediaItem.id) != null) {
+        log("seeking to ${box.read(oldMediaItem.id)}");
+        _audioHandler.seek(Duration(seconds: box.read(oldMediaItem.id)));
+      } else {
+        log("seeking to 0");
+        _audioHandler.seek(const Duration(seconds: 0));
+      }
+    });
+  }
+
+  Future<void> setAudioQuality(String quality) async {
+    audioQualityNotifier.value = quality;
+    prefs.write("audioQuality", quality);
   }
 
   Future<void> rewind() => _audioHandler.rewind();

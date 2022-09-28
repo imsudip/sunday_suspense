@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sunday_suspense/ui/app_colors.dart';
 
 class FCMFunctions {
   static final FCMFunctions _singleton = new FCMFunctions._internal();
@@ -34,6 +35,7 @@ class FCMFunctions {
         'high_importance_channel', // id
         'High Importance Notifications', // title
         importance: Importance.high,
+        showBadge: true,
       );
 
       flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -102,15 +104,13 @@ class FCMFunctions {
           notification.title,
           notification.body,
           NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
-              importance: Importance.max,
-              priority: Priority.high,
-              ticker: 'ticker',
-              icon: "@mipmap/ic_launcher",
-            ),
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description,
+                importance: Importance.max,
+                priority: Priority.high,
+                ticker: 'ticker',
+                icon: "@mipmap/ic_music",
+                color: AppColors.backgroundColor),
           ),
         );
       }

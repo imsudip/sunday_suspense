@@ -4,34 +4,33 @@
 
 An open source flutter project to listen to to our favourite Sunday Suspence
 
-[![made-with-flutter](https://img.shields.io/badge/Made%20with-Flutter-9a0e13.svg?style=for-the-badge&logo=flutter)](https://flutter.dev/) ![Release](https://img.shields.io/github/v/release/imsudip/sunday_suspense?style=for-the-badge) ![Downloads](https://img.shields.io/github/downloads/imsudip/sunday_suspense/total)
+[![made-with-flutter](https://img.shields.io/badge/Made%20with-Flutter-9a0e13.svg?style=for-the-badge&logo=flutter)](https://flutter.dev/) ![Release](https://img.shields.io/github/v/release/imsudip/sunday_suspense?style=for-the-badge) ![Downloads](https://img.shields.io/github/downloads/imsudip/sunday_suspense/total?style=for-the-badge)
 
 ### Don't forget to :star: the repo
 
-[![GitHub stars](https://img.shields.io/github/stars/imsudip/sunday_suspense.svg?style=social&label=Star)](https://github.com//imsudip/sunday_suspense) ![GitHub forks](https://img.shields.io/github/forks/imsudip/sunday_suspense.svg?style=social&label=Forks) 
+[![GitHub stars](https://img.shields.io/github/stars/imsudip/sunday_suspense.svg?style=for-the-badge&label=Star)](https://github.com//imsudip/sunday_suspense) ![GitHub forks](https://img.shields.io/github/forks/imsudip/sunday_suspense.svg?style=for-the-badge&label=Forks)
 
 ## Download
 
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
-     alt="Get it on IzzyDroid"
-     height="100">](https://android.izzysoft.de/repo/apk/com.shadow.blackhole)
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="100">](https://f-droid.org/packages/com.shadow.blackhole/)
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 [<img src="https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white"
      alt="Download from GitHub"
-     height="60">](https://github.com/Sangwan5688/BlackHole/releases)
+     height="60">](https://github.com/imsudip/sunday_suspense/releases)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[<img src="https://img.shields.io/badge/Telegram-2CA5E0?logo=telegram&logoColor=white"
-     alt="Join Telegram Channel"
-     height="60">](https://t.me/blackhole_official)
 
+## Features
+
+- Smooth and responsive UI
+- Curation of different categories
+- Minimalistic yet beautiful Player
+- Categorized by different genres and authors
+- Search for your favourite Sunday Suspense
+- Playback History (Remember where you left off)
+- Updated weekly with new episodes
+- More features coming soon
 
 ## Screenshots
 
-<img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/1.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/2.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/3.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/4.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/5.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/1.png" width="32%"> 
+<img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/1.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/2.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/3.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/4.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/5.png" width="32%"> <img src="https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/screenshot/1.png" width="32%">
 
 ## License
 
@@ -81,6 +80,5 @@ flutter run
 ## Contribute
 
 Contributions are welcome. Please read our [contributing guidelines](https://github.com/imsudip/sunday_suspense/blob/master/CONTRIBUTING.md) before contributing.
-
 
 ![made with flutter](https://raw.githubusercontent.com/imsudip/sunday_suspense/master/extras/bottom_bar.png)

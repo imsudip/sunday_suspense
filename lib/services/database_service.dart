@@ -1,74 +1,18 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:http/http.dart' as http;
-import 'package:sunday_suspense/services/service_locator.dart';
+import 'package:meilisearch/meilisearch.dart';
 
 import '../page_manager.dart';
 import '../widgets/song_viewers.dart';
+import 'package:http/http.dart' as http;
+
+import 'service_locator.dart';
 
 const String baseUrl = 'https://zk3rid.deta.dev';
 
 class DatabaseService {
   DatabaseService();
-
-  static Future<String> getStreamLink(String videoUrl) async {
-    loadingDialog();
-    final url = "$baseUrl/getLink?url=$videoUrl";
-    var res = await http.get(Uri.parse(url));
-    if (res.statusCode != 200) {
-      return "";
-    }
-    var jdata = jsonDecode(res.body);
-    var audio = buildQualityStore(jdata);
-    return audio;
-  }
-
-  static Future<List<Map<String, dynamic>>> getSongsUsingTag(String tag,
-      {bool fuzzy = false, String mode = "or", int count = 10, int page = 1}) async {
-    final url = "$baseUrl/search?query=$tag&count=$count&page=$page";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> getSongsFromSearch(String tag, {int count = 10, int page = 1}) async {
-    final url = "$baseUrl/search?query=$tag&count=$count&page=$page&fuzzy=true&mode=or";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> getLatestSongs({int count = 10, int page = 1}) async {
-    final url = "$baseUrl/getAllSongs?count=$count&page=$page";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> moreLikeThis(String videoId) async {
-    final url = "$baseUrl/moreLikeThis?videoId=$videoId";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> getSongByCategory(String category, {int count = 10, int page = 1}) async {
-    final url = "$baseUrl/getCategorySongs?category=$category&count=$count&page=$page";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata['results'].map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
-  static Future<List<Map<String, dynamic>>> getSongFromListt(List<String> idList) async {
-    idList.remove("");
-    var lString = jsonEncode(idList);
-    final url = "$baseUrl/getSongsFromList?list=$lString";
-    var res = await http.get(Uri.parse(url));
-    var jdata = jsonDecode(res.body);
-    return jdata.map<Map<String, dynamic>>((e) => e as Map<String, dynamic>).toList();
-  }
-
   static buildQualityStore(List<dynamic> data) {
     final pageManager = getIt<PageManager>();
     var qualityStore = <String, String>{};
@@ -94,6 +38,86 @@ class DatabaseService {
       return qualityStore[cuurentQuality];
     } else {
       return qualityStore.values.first;
+    }
+  }
+
+  static Future<String> getStreamLink(String videoUrl) async {
+    loadingDialog();
+    final url = "$baseUrl/getLink?url=$videoUrl";
+    var res = await http.get(Uri.parse(url));
+    if (res.statusCode != 200) {
+      return "";
+    }
+    var jdata = jsonDecode(res.body);
+    var audio = buildQualityStore(jdata);
+    return audio;
+  }
+
+  /// Get Trending Audios from database sorted by date
+  static Future<List<Map<String, dynamic>>> getTrending({int page = 1, int perPage = 20}) async {
+    final client = getIt<MeiliSearchClient>();
+    final index = client.index('sunday');
+    final res = await index.search(' ', limit: perPage, offset: (page - 1) * perPage, sort: ['timestamp:desc']);
+    return res.hits ?? [];
+  }
+
+  /// Search for audios in database
+  static Future<List<Map<String, dynamic>>> searchAudio(String tag, {int page = 1, int perPage = 20}) async {
+    final client = getIt<MeiliSearchClient>();
+    final index = client.index('sunday');
+    final res = await index.search(tag, limit: perPage, offset: (page - 1) * perPage, sort: ['timestamp:desc']);
+    return res.hits ?? [];
+  }
+
+  /// Get audios from a particular category like adventure, crime, etc
+  static Future<List<Map<String, dynamic>>> getAudioByTag(String tag, {int page = 1, int perPage = 20}) async {
+    final client = getIt<MeiliSearchClient>();
+    final index = client.index('sunday');
+    final res = await index
+        .search('', limit: perPage, offset: (page - 1) * perPage, sort: ['timestamp:desc'], filter: ['tags = $tag']);
+    return res.hits ?? [];
+  }
+
+  /// Get audios from a List of ids
+  static Future<List<Map<String, dynamic>>> getAudioFromList(
+    List<String> idList,
+  ) async {
+    final client = getIt<MeiliSearchClient>();
+    final index = client.index('sunday');
+    // remove all empty strings
+    idList.removeWhere((element) => element.isEmpty);
+    final res = await index.search('', sort: ['timestamp:desc'], filter: ['video_id IN [${idList.join(',')}]']);
+    return res.hits ?? [];
+  }
+
+  /// Get recommended audios from a particular audio title
+  static Future<List<Map<String, dynamic>>> moreLikethis(
+    String title,
+  ) async {
+    final client = getIt<MeiliSearchClient>();
+    final index = client.index('sunday');
+    List<Map<String, dynamic>> finalResult = [];
+    Set<String> titles = {};
+    var t1 = title.split('-');
+    for (var titlePart in t1) {
+      final res = await index.search('"$titlePart"', limit: 10, sort: ['timestamp:desc']);
+      for (var item in res.hits!) {
+        if (!titles.contains(item['title'])) {
+          finalResult.add(item);
+          titles.add(item['title']);
+        }
+      }
+    }
+    // print(finalResult.map((e) => e['title']));
+    if (finalResult.length < 15) {
+      final res2 = await getTrending(page: 1, perPage: 10 - finalResult.length);
+      return [...finalResult, ...res2];
+    } else if (finalResult.length > 15) {
+      var ranked = finalResult.toList();
+      ranked.sort((a, b) => b['views'].compareTo(a['views']));
+      return ranked.sublist(0, 10);
+    } else {
+      return finalResult.toList();
     }
   }
 }

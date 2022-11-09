@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../services/database_service.dart';
 import 'searchScreen.dart';
 import 'show_all_page.dart';
-import '../services/database_service.dart';
 import '../ui/app_colors.dart';
 import '../ui/text_styles.dart';
 import '../widgets/art_glass_overlay.dart';
@@ -102,7 +102,7 @@ class TrendingBar extends StatelessWidget {
                   Get.to(() => ShowAllPage(
                       title: "Trending",
                       future: (page) {
-                        return DatabaseService.getLatestSongs(page: page);
+                        return DatabaseService.getTrending(page: page);
                       }));
                 },
                 child: Text(
@@ -116,7 +116,7 @@ class TrendingBar extends StatelessWidget {
             height: 8,
           ),
           FutureBuilder(
-              future: DatabaseService.getLatestSongs(),
+              future: DatabaseService.getTrending(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List<dynamic> songs = snapshot.data!;
@@ -160,7 +160,7 @@ class CategoryBar extends StatelessWidget {
                   Get.to(() => ShowAllPage(
                       title: title,
                       future: (page) {
-                        return DatabaseService.getSongsUsingTag(tag, page: page);
+                        return DatabaseService.searchAudio(tag, page: page);
                       }));
                 },
                 child: Text(
@@ -174,7 +174,7 @@ class CategoryBar extends StatelessWidget {
             height: 8,
           ),
           FutureBuilder(
-              future: DatabaseService.getSongsUsingTag(tag),
+              future: DatabaseService.searchAudio(tag),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List<Map<String, dynamic>> songs = snapshot.data!;

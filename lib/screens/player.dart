@@ -170,9 +170,9 @@ class PlayerScreen extends StatelessWidget {
                 color: AppColors.backgroundColor,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ValueListenableBuilder<String>(
-                    valueListenable: pageManager.currentSongImageNotifier,
-                    builder: (_, art, __) {
-                      if (art == '') {
+                    valueListenable: pageManager.currentSongTitleNotifier,
+                    builder: (_, title, __) {
+                      if (title == '') {
                         return const SizedBox(
                           height: 200,
                           child: Center(
@@ -180,10 +180,9 @@ class PlayerScreen extends StatelessWidget {
                           ),
                         );
                       }
-                      var imageUrl = art;
-                      var videoId = imageUrl.split('/')[4];
+
                       return FutureBuilder(
-                        future: DatabaseService.moreLikeThis(videoId),
+                        future: DatabaseService.moreLikethis(title),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             List<dynamic> songs = snapshot.data!;

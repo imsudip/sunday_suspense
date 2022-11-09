@@ -27,7 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void submitSearch(String query) async {
     print("searching...");
-    var results = await DatabaseService.getSongsUsingTag(query);
+    var results = await DatabaseService.searchAudio(query);
     setState(() {
       page = 2;
       searchResults = results;
@@ -40,7 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
     print("loading more");
     if (!_hasMore) return false;
     print(page);
-    var songs = await DatabaseService.getSongsFromSearch(searchController.text, page: page);
+    var songs = await DatabaseService.searchAudio(searchController.text, page: page);
     if (songs.length < 10) {
       _hasMore = false;
     }
@@ -105,17 +105,20 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           Expanded(
-            child: LoadMore(
-              onLoadMore: _loadMore,
-              whenEmptyLoad: false,
-              isFinish: !_hasMore,
-              delegate: MyLoadMoreDelegate(),
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: searchResults.length,
-                itemBuilder: (context, index) {
-                  return MinimalVerticalListCard(songs: searchResults, index: index);
-                },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: LoadMore(
+                onLoadMore: _loadMore,
+                whenEmptyLoad: false,
+                isFinish: !_hasMore,
+                delegate: MyLoadMoreDelegate(),
+                child: ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  itemCount: searchResults.length,
+                  itemBuilder: (context, index) {
+                    return MinimalVerticalListCard(songs: searchResults, index: index);
+                  },
+                ),
               ),
             ),
           )

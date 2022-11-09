@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:get/get.dart';
-import 'show_all_page.dart';
 import '../services/database_service.dart';
+import 'show_all_page.dart';
 import '../ui/app_colors.dart';
 import '../ui/text_styles.dart';
 
@@ -161,7 +161,7 @@ class CategoryCard extends StatelessWidget {
           Get.to(() => ShowAllPage(
                 title: title,
                 future: (page) {
-                  return DatabaseService.getSongsUsingTag(keyword, page: page);
+                  return DatabaseService.searchAudio(keyword, page: page);
                 },
               ));
         },
@@ -200,7 +200,7 @@ class CategoryCard2 extends StatelessWidget {
           Get.to(() => ShowAllPage(
                 title: title,
                 future: (page) {
-                  return DatabaseService.getSongByCategory(keyword, page: page);
+                  return DatabaseService.getAudioByTag(keyword, page: page);
                 },
               ));
         },

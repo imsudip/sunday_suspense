@@ -1,5 +1,6 @@
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:sunday_suspense/services/notification_service.dart';
@@ -9,9 +10,10 @@ import 'page_manager.dart';
 import 'services/service_locator.dart';
 
 void main() async {
-  await setupServiceLocator();
   await GetStorage.init("prefs");
   await GetStorage.init('HistoryBox');
+  await dotenv.load(fileName: ".env");
+  await setupServiceLocator();
   runApp(const MyApp());
   await fcmFunctions.initApp();
   await fcmFunctions.iosWebPermission();

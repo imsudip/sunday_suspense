@@ -24,7 +24,7 @@ class _HistoryPageScreenState extends State<HistoryPageScreen> {
       if (mounted) {
         setState(() {});
         if (history.length != box.getKeys().length) {
-          DatabaseService.getSongFromListt(box.getKeys().map<String>((e) => e.toString()).toList()).then((value) {
+          DatabaseService.getAudioFromList(box.getKeys().map<String>((e) => e.toString()).toList()).then((value) {
             setState(() {
               history = value;
             });
@@ -32,7 +32,7 @@ class _HistoryPageScreenState extends State<HistoryPageScreen> {
         }
       }
     });
-    DatabaseService.getSongFromListt(box.getKeys().map<String>((e) => e.toString()).toList()).then((value) {
+    DatabaseService.getAudioFromList(box.getKeys().map<String>((e) => e.toString()).toList()).then((value) {
       setState(() {
         history = value;
       });

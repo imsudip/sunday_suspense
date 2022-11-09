@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'services/database_service.dart';
 import 'ui/app_colors.dart';
 import 'notifiers/play_button_notifier.dart';
 import 'notifiers/progress_notifier.dart';
 import 'notifiers/repeat_button_notifier.dart';
-import 'package:audio_service/audio_service.dart';
-import 'services/service_locator.dart';
 
 class PageManager {
   // Listeners: Updates going to the UI
@@ -26,16 +27,16 @@ class PageManager {
   final isShuffleModeEnabledNotifier = ValueNotifier<bool>(false);
   final audioQualityNotifier = ValueNotifier<String>('');
   final audioQualityStoreNotifier = ValueNotifier<Map<String, String>>({}); // Map<quality, url>
-
-  final _audioHandler = getIt<AudioHandler>();
+  final mediaItemNotifier = ValueNotifier<MediaItem?>(null);
+  // final _audioHandler = getIt<AudioHandler>();
+  late AudioPlayer audioPlayer;
 
   final box = GetStorage("HistoryBox");
   final prefs = GetStorage("prefs");
 
   // Events: Calls coming from the UI
   void init() async {
-    // await _loadPlaylist();
-    _listenToChangesInPlaylist();
+    await initiateBackgroundAudio();
     _listenToPlaybackState();
     _listenToCurrentPosition();
     _listenToBufferedPosition();
@@ -44,40 +45,36 @@ class PageManager {
     audioQualityNotifier.value = prefs.read("audioQuality") ?? "high";
   }
 
-  void _listenToChangesInPlaylist() {
-    _audioHandler.queue.listen((playlist) {
-      if (playlist.isEmpty) {
-        playlistNotifier.value = [];
-        currentSongTitleNotifier.value = '';
-        currentSongImageNotifier.value = '';
-        currentSongIdNotifier.value = '';
-      } else {
-        final newList = playlist.map((item) => item.title).toList();
-        playlistNotifier.value = newList;
-      }
-      _updateSkipButtons();
-    });
+  Future initiateBackgroundAudio() async {
+    await JustAudioBackground.init(
+      androidNotificationChannelId: 'com.example.sunday_suspense.channel.audio',
+      androidNotificationChannelName: 'Audio playback',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    );
+    audioPlayer = AudioPlayer();
   }
 
   void _listenToPlaybackState() {
-    _audioHandler.playbackState.listen((playbackState) {
+    audioPlayer.playerStateStream.listen((playbackState) {
       final isPlaying = playbackState.playing;
       final processingState = playbackState.processingState;
-      if (processingState == AudioProcessingState.loading || processingState == AudioProcessingState.buffering) {
+      if (processingState == ProcessingState.loading ||
+          processingState == ProcessingState.buffering ||
+          processingState == ProcessingState.idle) {
         playButtonNotifier.value = ButtonState.loading;
       } else if (!isPlaying) {
         playButtonNotifier.value = ButtonState.paused;
-      } else if (processingState != AudioProcessingState.completed) {
+      } else if (processingState != ProcessingState.completed) {
         playButtonNotifier.value = ButtonState.playing;
       } else {
-        _audioHandler.seek(Duration.zero);
-        _audioHandler.pause();
+        audioPlayer.pause();
       }
     });
   }
 
   void _listenToCurrentPosition() {
-    AudioService.position.listen((position) {
+    audioPlayer.positionStream.listen((position) {
       final oldState = progressNotifier.value;
       int seconds = position.inSeconds;
 
@@ -94,94 +91,38 @@ class PageManager {
   }
 
   void _listenToBufferedPosition() {
-    _audioHandler.playbackState.listen((playbackState) {
+    audioPlayer.bufferedPositionStream.listen((bufferedPosition) {
       final oldState = progressNotifier.value;
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
-        buffered: playbackState.bufferedPosition,
+        buffered: bufferedPosition,
         total: oldState.total,
       );
     });
   }
 
   void _listenToTotalDuration() {
-    _audioHandler.mediaItem.listen((mediaItem) {
+    audioPlayer.durationStream.listen((duration) {
       final oldState = progressNotifier.value;
       progressNotifier.value = ProgressBarState(
         current: oldState.current,
         buffered: oldState.buffered,
-        total: mediaItem?.duration ?? Duration.zero,
+        total: duration ?? Duration.zero,
       );
     });
   }
 
   void _listenToChangesInSong() {
-    _audioHandler.mediaItem.listen((mediaItem) {
-      currentSongTitleNotifier.value = mediaItem?.title ?? '';
-      currentSongImageNotifier.value = mediaItem?.artUri.toString() ?? '';
-      currentSongIdNotifier.value = mediaItem?.id ?? '';
+    mediaItemNotifier.addListener(() {
+      currentSongTitleNotifier.value = mediaItemNotifier.value?.title ?? '';
+      currentSongImageNotifier.value = mediaItemNotifier.value?.artUri.toString() ?? '';
+      currentSongIdNotifier.value = mediaItemNotifier.value?.id ?? '';
     });
   }
 
-  void _updateSkipButtons() {
-    final mediaItem = _audioHandler.mediaItem.value;
-    final playlist = _audioHandler.queue.value;
-    if (playlist.length < 2 || mediaItem == null) {
-      isFirstSongNotifier.value = true;
-      isLastSongNotifier.value = true;
-    } else {
-      isFirstSongNotifier.value = playlist.first == mediaItem;
-      isLastSongNotifier.value = playlist.last == mediaItem;
-    }
+  Future<void> seek(Duration position) async {
+    await audioPlayer.seek(position);
   }
-
-  void play() => _audioHandler.play();
-  void pause() => _audioHandler.pause();
-
-  void seek(Duration position) {
-    _audioHandler.seek(position).whenComplete(() {});
-  }
-
-  void previous() => _audioHandler.skipToPrevious();
-  void next() => _audioHandler.skipToNext();
-
-  void repeat() {
-    repeatButtonNotifier.nextState();
-    final repeatMode = repeatButtonNotifier.value;
-    switch (repeatMode) {
-      case RepeatState.off:
-        _audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
-        break;
-      case RepeatState.repeatSong:
-        _audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
-        break;
-      case RepeatState.repeatPlaylist:
-        _audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
-        break;
-    }
-  }
-
-  void shuffle() {
-    final enable = !isShuffleModeEnabledNotifier.value;
-    isShuffleModeEnabledNotifier.value = enable;
-    if (enable) {
-      _audioHandler.setShuffleMode(AudioServiceShuffleMode.all);
-    } else {
-      _audioHandler.setShuffleMode(AudioServiceShuffleMode.none);
-    }
-  }
-
-  // Future<void> add() async {
-  //   final songRepository = getIt<PlaylistRepository>();
-  //   final song = await songRepository.fetchAnotherSong();
-  //   final mediaItem = MediaItem(
-  //     id: song['id'] ?? '',
-  //     album: song['album'] ?? '',
-  //     title: song['title'] ?? '',
-  //     extras: {'url': song['url']},
-  //   );
-  //   _audioHandler.addQueueItem(mediaItem);
-  // }
 
   Future<void> addOne(dynamic audio) async {
     var streamUrl = await DatabaseService.getStreamLink(audio['url']);
@@ -200,46 +141,16 @@ class PageManager {
       artUri: Uri.parse(audio['thumbnail']),
       extras: {'url': streamUrl},
     );
-    await remove();
-    await _audioHandler.addQueueItem(mediaItem);
-    await _audioHandler.play();
 
-    Get.back();
-    Future.delayed(const Duration(seconds: 1), () {
-      _audioHandler.play();
-      if (box.read(audio['video_id']) != null) {
-        log("seeking to ${box.read(audio['video_id'])}");
-        _audioHandler.seek(Duration(seconds: box.read(audio['video_id'])));
-      } else {
-        log("seeking to 0");
-        _audioHandler.seek(const Duration(seconds: 0));
-      }
-    });
-
-    // _audioHandler.skipToQueueItem(index)
-  }
-
-  Future<void> changeAudioQuality(String url) async {
-    var oldMediaItem = _audioHandler.mediaItem.value!;
-    final newMediaItem = MediaItem(
-      id: oldMediaItem.id,
-      album: oldMediaItem.album,
-      title: oldMediaItem.title,
-      artUri: oldMediaItem.artUri,
-      extras: {'url': url},
+    mediaItemNotifier.value = mediaItem;
+    AudioSource audioSource = LockCachingAudioSource(
+      Uri.parse(streamUrl),
+      tag: mediaItem,
     );
-    await remove();
-    await _audioHandler.addQueueItem(newMediaItem);
-    await _audioHandler.play();
-    Future.delayed(const Duration(seconds: 1), () {
-      _audioHandler.play();
-      if (box.read(oldMediaItem.id) != null) {
-        log("seeking to ${box.read(oldMediaItem.id)}");
-        _audioHandler.seek(Duration(seconds: box.read(oldMediaItem.id)));
-      } else {
-        log("seeking to 0");
-        _audioHandler.seek(const Duration(seconds: 0));
-      }
+    Get.back();
+    Duration initialPosition = Duration(seconds: box.read(audio['video_id'] ?? '') ?? 0);
+    audioPlayer.setAudioSource(audioSource, initialPosition: initialPosition).whenComplete(() {
+      audioPlayer.play();
     });
   }
 
@@ -248,21 +159,48 @@ class PageManager {
     prefs.write("audioQuality", quality);
   }
 
-  Future<void> rewind() => _audioHandler.rewind();
-
-  Future<void> fastForward() => _audioHandler.fastForward();
-
-  Future<void> remove() async {
-    final lastIndex = _audioHandler.queue.value.length - 1;
-    if (lastIndex < 0) return;
-    await _audioHandler.removeQueueItemAt(lastIndex);
+  Future<void> changeAudioQuality(String url) async {
+    final oldMediaItem = mediaItemNotifier.value;
+    if (oldMediaItem == null) return;
+    final mediaItem = MediaItem(
+      id: oldMediaItem.id,
+      album: oldMediaItem.album,
+      title: oldMediaItem.title,
+      artUri: oldMediaItem.artUri,
+      extras: {'url': url},
+    );
+    mediaItemNotifier.value = mediaItem;
+    AudioSource audioSource = LockCachingAudioSource(
+      Uri.parse(url),
+      tag: mediaItem,
+    );
+    await audioPlayer.pause();
+    var currentDuration = audioPlayer.position;
+    await audioPlayer.setAudioSource(audioSource, initialPosition: currentDuration);
+    await audioPlayer.play();
   }
 
   void dispose() {
-    _audioHandler.customAction('dispose');
+    audioPlayer.dispose();
   }
 
   void stop() {
-    _audioHandler.stop();
+    audioPlayer.stop();
+  }
+
+  void pause() {
+    audioPlayer.pause();
+  }
+
+  void play() {
+    audioPlayer.play();
+  }
+
+  void fastForward() {
+    audioPlayer.seek(audioPlayer.position + const Duration(seconds: 10));
+  }
+
+  void rewind() {
+    audioPlayer.seek(audioPlayer.position - const Duration(seconds: 10));
   }
 }

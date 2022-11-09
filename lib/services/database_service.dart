@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:math';
 import 'package:meilisearch/meilisearch.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../page_manager.dart';
@@ -26,7 +26,6 @@ class DatabaseService {
       qualityStore['Low'] = data[0]['url'];
     }
     pageManager.audioQualityStoreNotifier.value = qualityStore;
-    log("Quality Store: ${qualityStore.keys}");
     var cuurentQuality = pageManager.audioQualityNotifier.value;
     if (qualityStore.containsKey(cuurentQuality)) {
       return qualityStore[cuurentQuality];
@@ -89,28 +88,10 @@ class DatabaseService {
   ) async {
     final client = getIt<MeiliSearchClient>();
     final index = client.index('sunday');
-    List<Map<String, dynamic>> finalResult = [];
-    Set<String> titles = {};
-    var t1 = title.split('-');
-    for (var titlePart in t1) {
-      final res = await index.search('"$titlePart"', limit: 10, sort: ['timestamp:desc']);
-      for (var item in res.hits!) {
-        if (!titles.contains(item['title'])) {
-          finalResult.add(item);
-          titles.add(item['title']);
-        }
-      }
-    }
-    // print(finalResult.map((e) => e['title']));
-    if (finalResult.length < 15) {
-      final res2 = await getTrending(page: 1, perPage: 10 - finalResult.length);
-      return [...finalResult, ...res2];
-    } else if (finalResult.length > 15) {
-      var ranked = finalResult.toList();
-      ranked.sort((a, b) => b['views'].compareTo(a['views']));
-      return ranked.sublist(0, 10);
-    } else {
-      return finalResult.toList();
-    }
+    final res = await index.search(" ", limit: 1, sort: ['timestamp:desc']);
+    var totalDocs = res.estimatedTotalHits ?? 0;
+    var randomoffset = Random().nextInt(totalDocs);
+    final res2 = await index.search(" ", limit: 20, offset: randomoffset, sort: ['timestamp:desc']);
+    return res2.hits ?? [];
   }
 }

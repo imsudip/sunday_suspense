@@ -60,7 +60,7 @@ class PlayerScreen extends StatelessWidget {
                             return PopupMenuButton<String>(
                               onSelected: (value) {
                                 pageManager.changeAudioQuality(pageManager.audioQualityStoreNotifier.value[value]!);
-                                pageManager.audioQualityNotifier.value = value;
+                                pageManager.setAudioQuality(value);
                               },
                               itemBuilder: (context) {
                                 // audio quality stored in {quality:url} format
@@ -68,9 +68,7 @@ class PlayerScreen extends StatelessWidget {
                                         pageManager.audioQualityStoreNotifier.value.keys.length, (index) => index)
                                     .map((e) => PopupMenuItem(
                                           value: pageManager.audioQualityStoreNotifier.value.keys.elementAt(e),
-                                          child: Text(pageManager.audioQualityStoreNotifier.value.keys
-                                              .elementAt(e)
-                                              .capitalizeFirst!),
+                                          child: Text(pageManager.audioQualityStoreNotifier.value.keys.elementAt(e)),
                                         ))
                                     .toList();
                               },
@@ -84,7 +82,7 @@ class PlayerScreen extends StatelessWidget {
                                       color: AppColors.primaryColor,
                                     ),
                                     const SizedBox(width: 5),
-                                    Text(quality.capitalizeFirst!),
+                                    Text(quality),
                                   ],
                                 ),
                               ),

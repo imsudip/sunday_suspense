@@ -28,7 +28,6 @@ dependencies:
   get_it: ^7.2.0
   get_storage: ^2.0.3
   google_fonts: ^3.0.1
-  http: ^0.13.5
   iconsax: ^0.0.8
   just_audio: ^0.9.28
   just_audio_background: ^0.0.1-beta.7
@@ -38,6 +37,7 @@ dependencies:
   octo_image: ^1.0.2
   package_info_plus: ^1.4.3+1
   solid_bottom_sheet: ^0.1.10
+  youtube_explode_dart: ^1.12.2
 
 dev_dependencies:
   flutter_lints: ^2.0.0

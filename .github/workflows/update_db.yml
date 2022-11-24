@@ -3,11 +3,15 @@ name: update_db
 on:
   schedule:
     - cron: "0 */4 * * 0" # every 4 hours on Sunday
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
       - name: checkout repo content
         uses: actions/checkout@v2 # checkout the repository content to github runner
 
@@ -29,16 +33,3 @@ jobs:
         run: |
           cd ./server
           python main.py
-
-      - name: commit files # commit the changes to the readme
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Update database" -a || true
-
-      - name: push changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: master

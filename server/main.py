@@ -4,7 +4,7 @@ import build_new_item
 import requests
 import json
 import meilisearch
-from update_readme import update_readme
+
 
 load_dotenv()
 meiliClient = meilisearch.Client(
@@ -59,7 +59,6 @@ def update_db():
         index = meiliClient.get_index('sunday')
         index.add_documents(new_items)
         send_notification(new_items[0])
-        update_readme()
     return
 
 

@@ -3,10 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:sunday_suspense/firebase_options.dart';
 import 'package:sunday_suspense/ui/app_colors.dart';
 
 class FCMFunctions {
-  static final FCMFunctions _singleton = new FCMFunctions._internal();
+  static final FCMFunctions _singleton = FCMFunctions._internal();
 
   FCMFunctions._internal();
 
@@ -26,7 +27,7 @@ class FCMFunctions {
 //************************************************************************************************************ */
 
   Future initApp() async {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
     messaging = FirebaseMessaging.instance;
 
@@ -58,7 +59,9 @@ class FCMFunctions {
   }
 
   Future subscripeToTopics(String topic) async {
-    await messaging.subscribeToTopic(topic);
+    if (!kIsWeb) {
+      await messaging.subscribeToTopic(topic);
+    }
   }
 
   ///Expire : https://firebase.google.com/docs/cloud-messaging/manage-tokens
@@ -68,17 +71,14 @@ class FCMFunctions {
   }
 
   void tokenListener() {
-    messaging.onTokenRefresh.listen((fcmToken) {
-      print("FCM Token dinlemede");
-      // TODO: If necessary send token to application server.
-    }).onError((err) {
+    messaging.onTokenRefresh.listen((fcmToken) {}).onError((err) {
       print(err);
     });
   }
 
   /// IOS
   Future iosWebPermission() async {
-    if (Platform.isIOS || kIsWeb) {
+    if (kIsWeb || Platform.isIOS) {
       NotificationSettings settings = await messaging.requestPermission(
         alert: true,
         announcement: false,

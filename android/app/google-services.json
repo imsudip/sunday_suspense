@@ -29,6 +29,13 @@
             {
               "client_id": "50945720064-69rfml9vv77g3ou0414gf048uugl4i9j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "50945720064-1a40ats3fthtkvi1p6in3ih89aj5dnkj.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sundaySuspense"
+              }
             }
           ]
         }

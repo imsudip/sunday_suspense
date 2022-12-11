@@ -6,7 +6,7 @@ An open source flutter project to listen to our favourite Sunday Suspense
 
 [![made-with-flutter](https://img.shields.io/badge/Made%20with-Flutter-9a0e13.svg?style=for-the-badge&logo=flutter)](https://flutter.dev/) ![Release](https://img.shields.io/github/v/release/imsudip/sunday_suspense?style=for-the-badge) ![Downloads](https://img.shields.io/github/downloads/imsudip/sunday_suspense/total?style=for-the-badge)
 
-[![update_db](https://github.com/imsudip/sunday_suspense/actions/workflows/update_db.yml/badge.svg?branch=master)](https://github.com/imsudip/sunday_suspense/actions/workflows/update_db.yml)
+[![DB Update](https://github.com/imsudip/sunday_suspense/actions/workflows/update_db.yml/badge.svg?branch=master)](https://github.com/imsudip/sunday_suspense/actions/workflows/update_db.yml) [![DB backup](https://github.com/imsudip/sunday_suspense/actions/workflows/db_backup.yml/badge.svg)](https://github.com/imsudip/sunday_suspense/actions/workflows/db_backup.yml)
 
 <!-- <UPDATE>Data last updated: 11/24/2022 04:30:55 PM</UPDATE> -->
 

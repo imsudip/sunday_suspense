@@ -1,0 +1,55 @@
+name: backup db
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # on 12:00 PM UTC+5:30 every Monday
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT }}
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9" # install the python version needed
+
+      - name: install python packages
+        run: |
+          cd ./server
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: execute py script # run main.py
+        env:
+          MASTER_KEY: ${{ secrets.MASTER_KEY }}
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
+        run: |
+          cd ./server
+          python backup.py
+
+      - name: create orphan # create orphan branch without deleting server/sunday.json
+        run: |
+          git add server/sunday.json 
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "backup" --no-verify --signoff
+
+          git checkout --orphan backup
+          git rm -rf .
+          git clean -df
+          git checkout master server/sunday.json
+      - name: configure git # configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: commit and push # commit and push the changes to the orphan branch
+        run: |
+          git add server/sunday.json 
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "backup" --no-verify --signoff
+          git push origin backup --force

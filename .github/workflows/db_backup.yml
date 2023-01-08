@@ -32,6 +32,7 @@ jobs:
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
           cd ./server
+          python checkup_db.py
           python backup.py
 
       - name: create orphan # create orphan branch without deleting server/sunday.json

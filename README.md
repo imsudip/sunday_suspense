@@ -41,7 +41,7 @@ An open source flutter project to listen to our favourite Sunday Suspense
 ```
 Copyright © 2022 Sudip Ghosh
 
-BlackHole is a free software licensed under GPL v3.0
+This is a free software licensed under GPL v3.0
 It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
